@@ -416,7 +416,7 @@
         <label class="f">Image shape<select id="sImgAspect"><option value="1:1">Square (1:1)</option><option value="3:4">Portrait (3:4)</option><option value="4:3">Landscape (4:3)</option><option value="9:16">Tall (9:16)</option><option value="16:9">Wide (16:9)</option><option value="auto">Let the model choose</option></select></label>
         <div class="f wide"><label class="f" for="sKey" style="margin:0">API key</label>
           <input type="password" id="sKey" maxlength="1024" autocomplete="off" spellcheck="false" placeholder="Paste your key">
-          <textarea id="sKeyFull" readonly hidden rows="2" spellcheck="false" aria-label="API key (shown in full)"></textarea>
+          <textarea id="sKeyFull" hidden rows="2" maxlength="1024" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="API key (shown in full)"></textarea>
           <p class="note" id="sKeyLen" aria-live="polite" hidden></p>
           <div class="keybtns"><button class="btn small" id="showKeyBtn" type="button">Show</button><button class="btn small danger" id="clearKeyBtn" type="button">Clear key</button></div>
           <p class="note lock">🔒 Your key is saved only in this browser's storage on this device. It is sent only to the API URL above, never anywhere else, and is never included in exports. Anyone who can use this browser on this device could read it, so clear it if you share the device.</p></div>
@@ -1936,9 +1936,17 @@ function setKeyShown(show) {
   const k = $('#sKey'), full = $('#sKeyFull');
   k.type = show ? 'text' : 'password'; k.hidden = show; full.hidden = !show;
   full.value = show ? k.value : '';
-  if (show) { full.style.height = 'auto'; full.style.height = full.scrollHeight + 2 + 'px'; }
+  if (show) fitKeyFull();
   $('#showKeyBtn').textContent = show ? 'Hide' : 'Show';
 }
+function fitKeyFull() { const full = $('#sKeyFull'); full.style.height = 'auto'; full.style.height = full.scrollHeight + 2 + 'px'; }
+/* Shown state: the wrapped copy is editable too. Every edit is cleaned (whitespace stripped, caret kept in place)
+   and mirrored into #sKey, which stays the single value Save / Clear / the length line read. */
+$('#sKeyFull').addEventListener('input', () => {
+  const full = $('#sKeyFull'), raw = full.value, c = cleanKey(raw).slice(0, 1024);
+  if (c !== raw) { const caret = cleanKey(raw.slice(0, full.selectionStart || 0)).length; full.value = c; const p = Math.min(caret, c.length); full.setSelectionRange(p, p); }
+  $('#sKey').value = c; updateKeyLen(); fitKeyFull();
+});
 $('#sKey').addEventListener('input', () => { const k = $('#sKey'), c = cleanKey(k.value); if (c !== k.value) k.value = c; updateKeyLen(); });
 $('#showKeyBtn').onclick = () => setKeyShown($('#sKey').type === 'password');
 $('#clearKeyBtn').onclick = () => { $('#sKey').value = ''; Store.setKey(''); setKeyShown(false); updateKeyLen(); toast('API key removed from this device'); };
