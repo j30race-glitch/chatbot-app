@@ -1,32 +1,19 @@
-# chatbot-app
-Character Chat - AI character chatbot (installable PWA, personal use)
+# Character Chat
 
-**Live:** https://j30race-glitch.github.io/chatbot-app/
+Single-file AI character chatbot (`index.html`). No server, no libraries; works from `file://` or any static host.
 
-Character Chat lets you chat with your own custom AI characters. It's one self-contained `index.html` (inline CSS and JS) with no frameworks, CDNs, accounts, ads or purchases. It talks to the AI only with **your own xAI API key**, and your key, characters and chats are saved in the browser's `localStorage` on your device. It's built for the Galaxy Z Fold7 cover screen (~412 px) and unfolded screen (~884 px), and it also runs in desktop browsers.
-
-## Use it
-1. Open the live link above in **Chrome** or **Samsung Internet** (or open `index.html` directly from a file).
-2. Go to **Settings** and paste your xAI API key, then tap **Save**. The key stays only on this device. It is sent only to the AI API you set (default `https://api.x.ai/v1`) and is never stored in this repo or in the offline cache.
-3. Pick or create a character and start chatting.
-
-## The menu
-- **Characters:** your saved characters, each with a portrait icon. A generated portrait is shown if the character has one; otherwise the app draws a small face from the character's hair, eye and skin colors, or shows its emoji on a colored circle (drawn on the device, no API call). Tap one to switch; each character keeps its own personality and chat history. Use **＋ New Character** or **🎭 New from preset…** (Mentor, Rival, Confidant, Scholar, Trickster, Stoic, Dominant, Submissive). Everything stays editable, and characters can be exported/imported as JSON.
-- **Chat:** the conversation with the current character.
-- **Settings:** API key, base URL and models, plus the safety rules editor (**✏️ Edit safety rules**, **Save rules**, **Reset to default**).
-
-## Portraits and images
-- In the character editor, set gender, apparent age and look, then **📸 Generate portrait** → **Use as avatar**.
-- In chat, 📸 (or `/selfie <scene>`) asks for a photo of the current character, and 🖼️ (or `/image <prompt>`) creates an image. Images use your xAI key and stay on this device.
-
-## Install as an app
-In Chrome or Samsung Internet, open the live link and use **⋮ → Add to Home screen / Install app**. It opens full-screen like a normal app.
-
-## Offline
-After the first visit, the app itself (page, manifest and icons) is cached by the service worker (`sw.js`, cache `chatbot-v3`), so it opens without a connection. Chatting and image generation still need the internet. AI requests are never cached.
-
-## Safety
-- **Always on, can't be turned off:** no sexual or romantic content involving minors, and no real-world harm (weapons for harm, violence planning, drug making, hacking people, fraud, self-harm). These checks are built into the code, and the locked "🔒 Always on" rules can't be edited or removed in Settings.
-- **Adults only:** every character must be 18+. This is enforced on save, on import and on every portrait or photo.
-
-Note: data is stored per browser. Chrome and Samsung Internet keep separate copies, so stick to one or move characters with export/import.
+- **Open:** open `index.html` in a browser (or serve the folder; then it installs as an app via `manifest.json` + `sw.js`).
+- **Set up:** ⚙️ Settings → paste your API key (stays in this browser's localStorage only) → Save. Defaults: `https://api.x.ai/v1`, model `grok-4.7` (editable).
+- **Characters:** 👥 → ＋ New character (or edit the starters Rex / Professor Ada Quill). Export/import as JSON.
+- **Roster & presets:** 👥 lists every character (portrait thumbnail, preset, gender, age); tap one to switch — each keeps its own system prompt and chat history. "🎭 New from preset…" or the editor's *Personality preset* picker fills personality, tone, speaking style, reply behavior and greeting from 8 styles (Mentor, Rival, Confidant, Scholar, Trickster, Stoic, Dominant, Submissive); everything stays editable.
+- **Appearance & portraits:** in the editor set gender, apparent age (adults only) and look, then 📸 *Generate portrait* → *Use as avatar*. In chat, 📸 (or `/selfie <scene>`) asks for a photo of the current character.
+- **Images:** 🖼️ or `/image <prompt>` → `POST {base}/images/generations` (model in Settings, default `grok-imagine-image-2.0`). Images stay on this device and are never sent to the chat model.
+- **Adults only:** every character must be 18+ (blank age counts as adult); enforced on save, import and every portrait/photo.
+- **Menu:** a full-screen menu is the first screen every time the app opens. It shows **all your characters** in a grid (portrait, or an auto-drawn avatar from hair/eye/skin colors, or the emoji on a colored circle — drawn locally, no API call; tap one to select it and open the chat; a placeholder appears when there are none), then **＋ New Character**, **Continue chat** (current character), **Characters** (full roster: edit, delete, presets, import/export), **Settings**, and a small **🛡️ Safety rules** button that opens the Safety Rules screen. Every view has a **☰** button back to the menu (header of the chat, Characters and Settings); the 👥 / ⚙️ header buttons and ← back buttons still work. Every tile has a **📷** badge (or long-press the tile ~½ s) that opens its **portrait sheet** instead of the chat.
+- **Portrait sheet (from the menu):** shows the current portrait and appearance (✏️ *Edit appearance* opens the editor), 📸 *Generate / Regenerate portrait* (the same generator and adults-only checks as the editor) → *Use as avatar*, 🗑️ *Remove portrait*, then *Save* (grid thumbnail updates at once) or *Cancel* (no change).
+- **Gallery photo:** 🖼️ *Choose from gallery* in the portrait sheet is locked by an owner password (asked once per session; 5 wrong tries → growing wait). The app stores only a salted 5-pass PBKDF2 hash of it, never the password. The chosen photo is shrunk on the device (256 px) and applied right away; it is stored in this browser only and is **never sent to any API** (no model checks it). To set or change the password: `GALLERY_PASSWORD='<your password>' node tools/set_gallery_password.js` (helper kept in the source folder, not published; rewrites the hash in `index.html`; then bump `CACHE_VERSION`).
+- **Safety Rules screen (🛡️ on the menu):** a green locked card — *Always on: no minors, no real harm* (cannot be changed) — then a content filter level: **Open** (default: no extra topics, Blunt tone, profanity on), **Moderate** (blocks Hate speech + Self-harm, Balanced, profanity on) or **Strict** (blocks Self-harm, Violence, Hate speech, Illegal drugs, Scams & fraud, Adult content; Gentle; profanity off; image prompts also get a no-adult-content/blocked-topics instruction). Topics can be removed (×) or added (＋ Add topic); tone Blunt/Balanced/Gentle and the profanity toggle can be changed. *Save* stores it in localStorage `cb.contentFilter`; *Reset to default* returns to Open. The filter is added to the system prompt **after** the locked rules and only ever adds limits (prompt-level only); the code guards are unaffected at every level.
+- **Safety:** the code guards are fixed and not configurable. They block sexual/romantic content involving minors and real-world harm requests (weapons for harm, violence planning, drug making, hacking people, fraud, self-harm). Everything else is allowed.
+- **Safety rules text:** Settings → *Safety rules (system prompt)* → ✏️ *Edit safety rules* → *Save rules* (stored in localStorage `cb.safetyRules`; *Reset to default* removes it). The edited text replaces the default rules at the end of every system prompt, but the locked “Always on: no minors, no real harm” rules (1 and 2) are always included and can't be edited or removed, and the code guards still run regardless.
+- **Tests:** `NODE_PATH=/tmp/lf2/node_modules node tests/run_tests.js` (mocked API, 412px + 884px).
+- Bump `CACHE_VERSION` in `sw.js` (`chatbot-v1` → `chatbot-v2` → `chatbot-v3` …; now `chatbot-v5`) whenever `index.html`, `manifest.json` or icons change.

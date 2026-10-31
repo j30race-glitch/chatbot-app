@@ -141,15 +141,37 @@
   #toast.show{opacity:1}
   @media (max-width:420px){ .hbtn{min-width:38px;padding:0 7px;font-size:17px} #who .sub{display:none} }
 
-  /* ---------- top navigation menu (Characters / Chat / Settings) ---------- */
-  :root{--nh:46px}
-  #topnav{flex:none;height:var(--nh);background:#0b0f17;display:flex;gap:4px;padding:4px 6px;border-bottom:1px solid #000;position:relative;z-index:60;min-width:0}
-  #topnav button{flex:1 1 0;min-width:0;border:0;border-radius:10px;background:none;color:var(--dim);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 6px;border-bottom:3px solid transparent;white-space:nowrap;overflow:hidden}
-  #topnav button .ni{font-size:17px}
-  #topnav button.active{color:var(--accent);background:var(--panel);border-bottom-color:var(--accent)}
-  #topnav button:active{filter:brightness(1.2)}
-  .screen{top:calc(var(--nh) + env(safe-area-inset-top));padding-top:0}
-  @media (min-width:700px){ #topnav{justify-content:center} #topnav button{flex:0 1 200px;font-size:15px} }
+  /* ---------- full-screen menu (first screen on every load) ---------- */
+  #menuScreen .inner{display:flex;flex-direction:column;gap:12px}
+  #menuScreen .mhead{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:2px 0 0}
+  #menuScreen .mhead h3{margin:0;font-size:16px}
+  #menuScreen .mhead span{font-size:12.5px;color:var(--dim)}
+  .mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+  @media (min-width:700px){ .mgrid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))} }
+  .mtile{display:flex;flex-direction:column;align-items:center;gap:7px;min-width:0;border:2px solid transparent;border-radius:14px;background:var(--panel);padding:12px 6px 10px;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+  .mtile.active{border-color:var(--accent)}
+  .mtile:active{filter:brightness(1.2)}
+  .mtile .mph{position:relative;display:block}
+  .mtile .mph > .av{width:58px;height:58px;font-size:32px}
+  .mtile .mph > .av.auto .badge{font-size:17px}
+  .mbadge{position:absolute;top:-6px;right:-14px;width:30px;height:30px;border-radius:50%;border:2px solid var(--panel);background:#3a4763;font-size:14px;line-height:1;padding:0;display:flex;align-items:center;justify-content:center}
+  .mbadge:active{filter:brightness(1.25)}
+  .mtile:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .mtile b{max-width:100%;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mempty{grid-column:1 / -1;background:var(--panel);border-radius:14px;padding:18px 12px;text-align:center;color:var(--dim)}
+  .mempty .phrow{display:flex;justify-content:center;gap:10px;margin-bottom:10px;opacity:.45}
+  .mempty p{margin:0}
+  .mbig{display:flex;align-items:center;gap:12px;width:100%;min-width:0;border:0;border-radius:14px;padding:14px;background:var(--card);font-size:16px;font-weight:700;text-align:left}
+  .mbig.primary{background:var(--accent);color:#222}
+  .mbig:active{filter:brightness(1.2)}
+  .mbig .mi{flex:none;font-size:22px;width:36px;text-align:center}
+  .mbig .av{width:36px;height:36px}
+  .mbig .mt{flex:1;min-width:0;display:flex;flex-direction:column}
+  .mbig .mt small{font-weight:400;font-size:12.5px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mbig.primary .mt small{color:#5a4a10}
+  .msafety{align-self:center;border:1px solid #3c6b4c;background:#1c2a22;color:#bfe3c8;border-radius:9px;padding:6px 12px;font-size:13px;font-weight:600;margin-top:-4px}
+  .msafety:active{filter:brightness(1.2)}
+  .mbtns{display:flex;flex-direction:column;gap:10px;margin-top:4px}
   /* auto avatars in the character list (no portrait yet) */
   .av.auto{position:relative;overflow:visible}
   .av.auto svg{width:100%;height:100%;display:block;border-radius:50%}
@@ -170,17 +192,65 @@
   #sRules{min-height:200px;font-size:13px;line-height:1.45}
   #sRules[readonly]{opacity:.8;background:#10151f}
   #rulesMsg{min-height:1em}
+  /* ---------- Safety Rules screen (content filter) ---------- */
+  #safetyScreen{--vio:#7c5cff;--vio2:#5b3fd9;background:#0d0f16}
+  #safetyScreen .bar{background:transparent;border-bottom:0}
+  #safetyScreen .inner{display:flex;flex-direction:column;gap:6px;padding-top:0}
+  #safetyTitle{margin:0 0 8px;font-size:30px;font-weight:800;letter-spacing:-.3px}
+  .sflock{display:flex;align-items:center;gap:14px;background:#13261b;border:1px solid #2f6b45;border-radius:14px;padding:14px}
+  .sflock .pad{flex:none;width:52px;height:52px;border-radius:12px;background:#1f3a29;display:flex;align-items:center;justify-content:center;font-size:24px}
+  .sflock .lt{min-width:0;display:flex;flex-direction:column;gap:4px}
+  .sflock .lt b{font-weight:600;font-size:16px;line-height:1.3}
+  .sflock .lt span{color:#5fd38a;font-size:14px}
+  .sflabel{font-size:16px;font-weight:600;margin:14px 0 6px}
+  .seg{display:flex;background:#151a26;border:1px solid #2a3142;border-radius:12px;padding:3px;gap:2px}
+  .seg button{flex:1 1 0;min-width:0;border:0;background:none;border-radius:9px;padding:10px 4px;font-size:15px;font-weight:600}
+  .seg button.on,.pills button.on{background:linear-gradient(90deg,var(--vio),var(--vio2));color:#fff;border-color:transparent}
+  .sfcap{font-size:13.5px;color:var(--dim);margin:8px 0 0;min-height:1em}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .chip{display:inline-flex;align-items:center;gap:8px;max-width:100%;border:1px solid #2a3142;background:#151a26;border-radius:12px;padding:8px 10px 8px 14px;font-size:15px}
+  .chip span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .chip button{flex:none;border:0;background:none;font-size:17px;line-height:1;padding:0 2px;color:var(--ink)}
+  #sfNone{font-size:16px;font-weight:700;margin:0 0 4px}
+  .addchip{border:1px solid #4b3a8f;background:none;color:#a990ff;border-radius:12px;padding:9px 16px;font-size:16px;font-weight:600}
+  #sfAddRow{display:flex;gap:6px;margin-top:8px}
+  #sfAddRow input{flex:1}
+  .pills{display:flex;gap:8px}
+  .pills button{flex:1 1 0;min-width:0;border:1px solid #2a3142;background:#151a26;border-radius:12px;padding:10px 4px;font-size:15px;font-weight:600}
+  .sfrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px}
+  .sfrow .sflabel{margin:0}
+  .tog{position:relative;flex:none;width:56px;height:32px;border:0;border-radius:16px;background:#2a3142;padding:0;transition:background .15s}
+  .tog::after{content:'';position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;transition:left .15s}
+  .tog[aria-checked="true"]{background:linear-gradient(90deg,var(--vio),var(--vio2))}
+  .tog[aria-checked="true"]::after{left:27px}
+  .sfadv{align-self:flex-start;border:0;background:none;color:var(--dim);font-size:13px;text-decoration:underline;padding:12px 0 0}
+  .sffoot{flex:none;display:flex;gap:12px;padding:12px;background:#0d0f16;border-top:1px solid #1c2130}
+  .sffoot .in{max-width:var(--maxw);margin:0 auto;width:100%;display:flex;gap:12px}
+  .sffoot button{flex:1 1 0;min-width:0;border-radius:14px;padding:15px 8px;font-size:16px;font-weight:600}
+  #sfReset{border:1px solid #2f3546;background:#121621}
+  #sfSave{border:0;background:linear-gradient(90deg,var(--vio),var(--vio2));color:#fff}
+  @media (min-width:700px){ #safetyTitle{font-size:34px} .pills{max-width:520px} }
+  /* ---------- portrait sheet (menu: 📷 badge or long-press on a tile) ---------- */
+  #psTop{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  #psPreview .av{width:128px;height:128px;font-size:64px;border-radius:18px}
+  #psPreview .av img{border-radius:18px}
+  #psPreview .av.auto svg{border-radius:18px}
+  #psTop .pt{flex:1 1 180px;min-width:0}
+  #psTop .pt b{display:block;font-size:18px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #psLook{font-size:13px;color:var(--dim);line-height:1.4;margin:4px 0 8px;overflow-wrap:anywhere}
+  #psGen #portraitArea{margin:0}
+  #psGal{display:flex;flex-direction:column;gap:8px}
+  #psGalBox img{display:block;width:min(100%,320px);height:auto;border-radius:14px;background:#0003;margin-bottom:8px}
+  #psMsg{min-height:1em}
+  .psfoot{flex:none;padding:10px 12px;background:#10151f;border-top:1px solid #000}
+  .psfoot .in{max-width:var(--maxw);margin:0 auto;display:flex;gap:10px}
+  .psfoot .btn{flex:1 1 0;padding:13px 8px;font-size:15px}
 </style>
 </head>
 <body>
-<!-- ======================= top navigation menu ======================= -->
-<nav id="topnav" aria-label="Main menu">
-  <button type="button" data-tab="chars" id="navChars"><span class="ni">👥</span><span>Characters</span></button>
-  <button type="button" data-tab="chat" id="navChat" class="active" aria-current="page"><span class="ni">💬</span><span>Chat</span></button>
-  <button type="button" data-tab="settings" id="navSettings"><span class="ni">⚙️</span><span>Settings</span></button>
-</nav>
 <!-- ======================= main chat view ======================= -->
 <header>
+  <button class="hbtn" id="menuBtn" data-menu title="Menu" aria-label="Menu">☰</button>
   <button class="hbtn" id="charsBtn" title="Characters" aria-label="Characters">👥</button>
   <button id="who" title="Edit this character" aria-label="Edit this character">
     <span class="av" id="whoAv">🙂</span>
@@ -199,9 +269,67 @@
   </div>
 </footer>
 
+<!-- ======================= full-screen menu (shown first on every load) ======================= -->
+<section class="screen open" id="menuScreen" aria-label="Menu">
+  <div class="bar"><h2>💬 Character Chat</h2></div>
+  <div class="body"><div class="inner">
+    <div class="mhead"><h3>Your characters</h3><span id="menuCount"></span></div>
+    <div class="mgrid" id="menuChars"></div>
+    <div class="mbtns">
+      <button class="mbig primary" id="menuNewChar" type="button"><span class="mi">＋</span><span class="mt"><span>New Character</span><small>Create someone new to chat with</small></span></button>
+      <button class="mbig" id="menuChat" type="button"><span class="mi" id="menuChatAv">💬</span><span class="mt"><span>Continue chat</span><small id="menuChatSub"></small></span></button>
+      <button class="mbig" id="menuCharsBtn" type="button"><span class="mi">👥</span><span class="mt"><span>Characters</span><small>Edit, delete, presets, import / export</small></span></button>
+      <button class="mbig" id="menuSettings" type="button"><span class="mi">⚙️</span><span class="mt"><span>Settings</span><small>API key, model, replies, safety rules</small></span></button>
+      <button class="msafety" id="menuSafety" type="button">🛡️ Safety rules</button>
+    </div>
+  </div></div>
+</section>
+
+<!-- ======================= Safety Rules screen (content filter) ======================= -->
+<section class="screen" id="safetyScreen" aria-label="Safety Rules">
+  <div class="bar"><button class="hbtn" id="sfBack" title="Back to menu" aria-label="Back to menu">←</button></div>
+  <div class="body"><div class="inner">
+    <h1 id="safetyTitle">Safety Rules</h1>
+    <div class="sflock" id="sfLocked" aria-readonly="true"><span class="pad" aria-hidden="true">🔒</span><span class="lt"><b>Always on: no minors, no real harm.</b><span>● Locked</span></span></div>
+    <div class="sflabel" id="sfLevelLbl">Content filter level</div>
+    <div class="seg" id="sfLevel" role="radiogroup" aria-labelledby="sfLevelLbl"><button type="button" role="radio" data-level="open">Open</button><button type="button" role="radio" data-level="moderate">Moderate</button><button type="button" role="radio" data-level="strict">Strict</button></div>
+    <p class="sfcap" id="sfCaption"></p>
+    <div class="sflabel">Blocked topics</div>
+    <p id="sfNone">No extra topics blocked</p>
+    <div class="chips" id="sfChips"><button type="button" class="addchip" id="sfAdd">＋ Add topic</button></div>
+    <div id="sfAddRow" hidden><input type="text" id="sfTopicIn" maxlength="40" list="dlTopics" placeholder="e.g. Gambling" aria-label="Topic to block"><button type="button" class="btn small primary" id="sfTopicOk">Add</button></div>
+    <datalist id="dlTopics"><option value="Hate speech"><option value="Self-harm"><option value="Violence"><option value="Illegal drugs"><option value="Scams & fraud"><option value="Adult content"><option value="Gore"><option value="Gambling"><option value="Politics"><option value="Religion"></datalist>
+    <div class="sflabel" id="sfToneLbl">Response tone</div>
+    <div class="pills" id="sfTone" role="radiogroup" aria-labelledby="sfToneLbl"><button type="button" role="radio" data-tone="blunt">Blunt</button><button type="button" role="radio" data-tone="balanced">Balanced</button><button type="button" role="radio" data-tone="gentle">Gentle</button></div>
+    <div class="sfrow"><span class="sflabel" id="sfProfLbl">Allow profanity</span><button type="button" class="tog" id="sfProf" role="switch" aria-checked="true" aria-labelledby="sfProfLbl"></button></div>
+    <button type="button" class="sfadv" id="sfAdvanced">Advanced: custom rules text</button>
+  </div></div>
+  <div class="sffoot"><div class="in"><button type="button" id="sfReset">Reset to default</button><button type="button" id="sfSave">Save</button></div></div>
+</section>
+
+<!-- ======================= portrait sheet (from the menu grid) ======================= -->
+<section class="screen" id="portraitSheet" aria-label="Edit portrait">
+  <div class="bar"><button class="hbtn" id="psBack" title="Cancel" aria-label="Cancel">←</button><h2 id="psTitle">Portrait</h2></div>
+  <div class="body"><div class="inner">
+    <div class="card" id="psTop"><span id="psPreview"></span><div class="pt"><b id="psName"></b><p id="psLook"></p><button class="btn small" id="psEditLook" type="button">✏️ Edit appearance</button></div></div>
+    <div class="card"><h3>📸 Photorealistic portrait</h3><p class="note">Made from the character's appearance with the same safety and adults-only checks as the editor.</p><div id="psGen" style="margin-top:10px"></div></div>
+    <div class="card" id="psGal"><h3>🖼️ From your gallery</h3>
+      <p class="note">The photo stays on this device: it's shrunk here and saved in this browser only, never sent to any API.</p>
+      <div class="btns"><button class="btn" id="psGalleryBtn" type="button">🖼️ Choose from gallery</button><input type="file" id="psFile" accept="image/*" hidden></div>
+      <div id="psGate" hidden><label class="f" for="psGatePw" style="margin:0">Gallery password <small>Needed once per session to pick a photo. Not saved anywhere.</small></label>
+        <div class="keyrow" style="margin-top:6px"><input type="password" id="psGatePw" autocomplete="off" spellcheck="false" placeholder="Password" aria-label="Gallery password"><button class="btn small primary" id="psGateOk" type="button">Unlock</button></div>
+        <p class="note" id="psGateMsg" role="status"></p></div>
+      <div id="psGalBox" hidden><img id="psGalImg" alt="Chosen photo"><div class="btns"><button class="btn primary small" id="psGalUse" type="button">✅ Use photo</button><button class="btn small" id="psGalCancel" type="button">Cancel</button></div></div>
+    </div>
+    <div class="btns"><button class="btn danger" id="psRemove" type="button">🗑️ Remove portrait</button></div>
+    <p class="note" id="psMsg" role="status"></p>
+  </div></div>
+  <div class="psfoot"><div class="in"><button class="btn" id="psCancel" type="button">Cancel</button><button class="btn primary" id="psSave" type="button">Save</button></div></div>
+</section>
+
 <!-- ======================= characters list ======================= -->
 <section class="screen" id="charsScreen" aria-label="Characters">
-  <div class="bar"><button class="hbtn" data-close title="Back" aria-label="Back">←</button><h2>Characters</h2></div>
+  <div class="bar"><button class="hbtn" data-close title="Back" aria-label="Back">←</button><h2>Characters</h2><button class="hbtn" data-menu title="Menu" aria-label="Menu">☰</button></div>
   <div class="body"><div class="inner">
     <div class="btns">
       <button class="btn primary" id="newCharBtn">＋ New character</button>
@@ -269,7 +397,7 @@
 
 <!-- ======================= settings ======================= -->
 <section class="screen" id="settingsScreen" aria-label="Settings">
-  <div class="bar"><button class="hbtn" data-close title="Back" aria-label="Back">←</button><h2>Settings</h2><button class="btn primary small" id="saveSettingsBtn">Save</button></div>
+  <div class="bar"><button class="hbtn" data-close title="Back" aria-label="Back">←</button><h2>Settings</h2><button class="btn primary small" id="saveSettingsBtn">Save</button><button class="hbtn" data-menu title="Menu" aria-label="Menu">☰</button></div>
   <div class="body"><div class="inner">
     <div class="card">
       <h3>AI service</h3>
@@ -521,6 +649,48 @@ function effectiveSafetyRules() {
   return [RULES_HEADER, LOCKED_RULES].concat(body ? [body] : []).concat(LOCKED_TAIL).join('\n');
 }
 
+/* ---- content filter (Safety Rules screen). Prompt-level only: it can add limits on top of the rules above but never
+   loosens them, and the code guards (Guard, looksMinor, adultProblem, image checks) run the same at every level. ---- */
+const FILTER_KEY = 'cb.contentFilter';
+const FILTER_LEVELS = Object.freeze({
+  open: Object.freeze({ name: 'Open', caption: 'Open: only the always-on rules apply.', topics: Object.freeze([]), tone: 'blunt', profanity: true }),
+  moderate: Object.freeze({ name: 'Moderate', caption: 'Moderate: blocks a few sensitive topics.', topics: Object.freeze(['Hate speech', 'Self-harm']), tone: 'balanced', profanity: true }),
+  strict: Object.freeze({ name: 'Strict', caption: 'Strict: blocks sensitive and adult topics.', topics: Object.freeze(['Self-harm', 'Violence', 'Hate speech', 'Illegal drugs', 'Scams & fraud', 'Adult content']), tone: 'gentle', profanity: false })
+});
+const FILTER_TONES = Object.freeze({ blunt: 'Blunt: direct and unfiltered; say what you think without softening it.', balanced: 'Balanced: honest but tactful.', gentle: 'Gentle: warm, kind and careful; soften hard truths.' });
+const DEFAULT_FILTER = () => filterPreset('open');
+function filterPreset(level) { const L = FILTER_LEVELS[level] || FILTER_LEVELS.open; return { level: FILTER_LEVELS[level] ? level : 'open', topics: L.topics.slice(), tone: L.tone, profanity: L.profanity }; }
+function cleanTopic(t) { return sanitizeField(String(t || '').replace(/[\r\n\t]+/g, ' ').replace(/[#<>]/g, '')).replace(/\s+/g, ' ').slice(0, 40).trim(); }
+function normalizeFilter(f) {
+  f = f && typeof f === 'object' ? f : {};
+  const out = DEFAULT_FILTER();
+  if (FILTER_LEVELS[f.level]) out.level = f.level;
+  if (Array.isArray(f.topics)) { const seen = new Set(); out.topics = []; for (const t of f.topics) { const c = cleanTopic(t); if (c && !seen.has(c.toLowerCase()) && out.topics.length < 20) { seen.add(c.toLowerCase()); out.topics.push(c); } } }
+  if (FILTER_TONES[f.tone]) out.tone = f.tone;
+  if (typeof f.profanity === 'boolean') out.profanity = f.profanity;
+  return out;
+}
+/** The saved content filter, or null when none is saved (default = Open, which adds nothing to the prompt). */
+function savedFilter() { try { const v = localStorage.getItem(FILTER_KEY); return v == null ? null : normalizeFilter(JSON.parse(v)); } catch (e) { return null; } }
+function contentFilter() { return savedFilter() || DEFAULT_FILTER(); }
+/** Extra prompt section from the saved filter, appended after the safety rules (empty when nothing is saved). */
+function contentFilterSection() {
+  const f = savedFilter(); if (!f) return '';
+  const L = FILTER_LEVELS[f.level];
+  return [
+    '### CONTENT FILTER (the user\'s setting; it only adds limits on top of the always-on rules above and can never loosen them)',
+    'Filter level: ' + L.name + '. ' + L.caption.replace(/^\w+:\s*/, ''),
+    f.topics.length ? 'Blocked topics: refuse briefly or steer the conversation away from these, even in role-play, fiction or hypotheticals: ' + f.topics.join('; ') + '. Where this list blocks something rule 4 above allows, follow this list.' : 'Blocked topics: none beyond the always-on rules.',
+    'Response tone: ' + FILTER_TONES[f.tone],
+    'Profanity: ' + (f.profanity ? 'allowed.' : 'not allowed. Do not swear or use profanity; keep the language clean, even if the user swears.')
+  ].join('\n');
+}
+/** Extra instruction added to image prompts when the filter is Strict. */
+function imageFilterSuffix() {
+  const f = savedFilter(); if (!f || f.level !== 'strict') return '';
+  return ' Content limits: no nudity, sexual or adult content' + (f.topics.length ? '; do not depict: ' + f.topics.join(', ') : '') + '.';
+}
+
 const FIELD_LABELS = [
   ['age', 'Age'], ['personality', 'Personality'], ['backstory', 'Backstory'], ['tone', 'Tone'], ['speakingStyle', 'Speaking style'],
   ['quirks', 'Quirks & catchphrases'], ['likes', 'Likes'], ['dislikes', 'Dislikes'], ['relationship', 'Relationship to the user'],
@@ -544,6 +714,7 @@ function buildSystemPrompt(c) {
   const traits = (c.customTraits || []).filter(t => sanitizeField(t.key) || sanitizeField(t.value));
   if (traits.length) { lines.push('Custom traits:'); for (const t of traits) lines.push('- ' + sanitizeField(t.key) + ': ' + sanitizeField(t.value)); }
   lines.push('</character_definition>', '', effectiveSafetyRules());
+  const cf = contentFilterSection(); if (cf) lines.push('', cf);
   return lines.join('\n');
 }
 
@@ -1010,7 +1181,7 @@ async function callImage(prompt, signal, opts) {
   const key = Store.getKey();
   if (!key) throw new ApiError('Add your API key in Settings ⚙️ first.', 'nokey');
   if (!validBase(s.baseUrl)) throw new ApiError('The API URL in Settings must start with https:// .', 'url');
-  const body = { model: s.imageModel || DEFAULT_SETTINGS.imageModel, prompt, n: 1, response_format: 'b64_json' };
+  const body = { model: s.imageModel || DEFAULT_SETTINGS.imageModel, prompt: prompt + imageFilterSuffix(), n: 1, response_format: 'b64_json' };
   const aspect = (opts && opts.aspect) || s.imageAspect;
   if (aspect && aspect !== 'auto') body.aspect_ratio = aspect;
   let res;
@@ -1188,25 +1359,217 @@ $('#clearBtn').onclick = () => {
 };
 
 /* ---------------- screens ---------------- */
-function openScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.toggle('open', s.id === id)); syncNav(); }
-function closeScreens() { document.querySelectorAll('.screen').forEach(s => s.classList.remove('open')); syncNav(); }
+function openScreen(id) { if (id !== 'portraitSheet') restorePortraitArea(); document.querySelectorAll('.screen').forEach(s => s.classList.toggle('open', s.id === id)); }
+function closeScreens() { restorePortraitArea(); document.querySelectorAll('.screen').forEach(s => s.classList.remove('open')); }
 document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => {
   const scr = b.closest('.screen');
-  if (scr.id === 'editorScreen' && editorReturn === 'chars') { renderCharList(); openScreen('charsScreen'); } else closeScreens();
+  if (scr.id === 'editorScreen' && editorReturn === 'chars') { renderCharList(); openScreen('charsScreen'); } else if (scr.id === 'editorScreen' && editorReturn === 'menu') showMenu(); else closeScreens();
 });
 $('#charsBtn').onclick = () => { renderCharList(); openScreen('charsScreen'); };
 $('#who').onclick = () => { if (activeChar()) openEditor(activeId, 'chat'); else { renderCharList(); openScreen('charsScreen'); } };
 $('#settingsBtn').onclick = () => openSettings();
 
-/* ---------------- top navigation menu ---------------- */
-function currentTab() { const o = document.querySelector('.screen.open'); return !o ? 'chat' : o.id === 'settingsScreen' ? 'settings' : 'chars'; }
-function syncNav() { const t = currentTab(); document.querySelectorAll('#topnav [data-tab]').forEach(b => { const on = b.dataset.tab === t; b.classList.toggle('active', on); if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }); }
-function showTab(t) {
-  if (t === 'chars') { renderCharList(); openScreen('charsScreen'); }
-  else if (t === 'settings') openSettings();
-  else closeScreens();
+/* ---------------- full-screen menu (first screen on every load) ---------------- */
+function renderMenu() {
+  const grid = $('#menuChars'); grid.textContent = '';
+  $('#menuCount').textContent = chars.length ? chars.length + (chars.length === 1 ? ' character' : ' characters') : '';
+  if (!chars.length) {
+    const box = el('div', 'mempty'); box.id = 'menuEmpty';
+    const row = el('div', 'phrow'); row.setAttribute('aria-hidden', 'true'); for (let i = 0; i < 3; i++) row.appendChild(el('span', 'av', '👤'));
+    box.append(row, el('p', null, 'No characters yet. Tap ＋ New Character to create one.'));
+    grid.appendChild(box);
+  }
+  for (const c of chars) {
+    const b = el('div', 'mtile' + (c.id === activeId ? ' active' : '')); b.dataset.id = c.id;
+    b.setAttribute('role', 'button'); b.tabIndex = 0;
+    b.title = 'Chat with ' + (c.name || 'Unnamed') + ' (long-press to edit the portrait)'; b.setAttribute('aria-label', 'Chat with ' + (c.name || 'Unnamed'));
+    const ph = el('span', 'mph'); ph.appendChild(listAvatarNode(c));
+    const badge = el('button', 'mbadge', '📷'); badge.type = 'button'; badge.title = 'Edit portrait'; badge.setAttribute('aria-label', 'Edit portrait of ' + (c.name || 'Unnamed'));
+    badge.onclick = e => { e.stopPropagation(); openPortraitSheet(c.id); };
+    ph.appendChild(badge);
+    b.append(ph, el('b', null, c.name || 'Unnamed'));
+    const openIt = () => { if (busy) stopGeneration(); openChat(c.id); closeScreens(); };
+    // long-press (~500 ms, touch or mouse) opens the portrait sheet; it never also opens the chat
+    let lpT = null, lpFired = false, lpX = 0, lpY = 0;
+    const lpClear = () => { clearTimeout(lpT); lpT = null; };
+    b.addEventListener('pointerdown', e => { if (e.target.closest('.mbadge') || (e.pointerType === 'mouse' && e.button !== 0)) return; lpFired = false; lpX = e.clientX; lpY = e.clientY; lpClear(); lpT = setTimeout(() => { lpT = null; lpFired = true; openPortraitSheet(c.id); }, 500); });
+    b.addEventListener('pointermove', e => { if (lpT && Math.hypot(e.clientX - lpX, e.clientY - lpY) > 10) lpClear(); });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => b.addEventListener(ev, lpClear));
+    b.addEventListener('contextmenu', e => e.preventDefault());
+    b.onclick = e => { if (lpFired) { lpFired = false; e.preventDefault(); return; } if (e.target.closest('.mbadge')) return; openIt(); };
+    b.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openIt(); } };
+    grid.appendChild(b);
+  }
+  const c = activeChar();
+  const av = c ? avatarNode(c) : el('span', 'mi', '💬'); av.id = 'menuChatAv'; $('#menuChatAv').replaceWith(av);
+  $('#menuChatSub').textContent = c ? 'With ' + (c.name || 'Unnamed') : 'Pick or create a character first';
 }
-document.querySelectorAll('#topnav [data-tab]').forEach(b => b.onclick = () => showTab(b.dataset.tab));
+function showMenu() { renderMenu(); openScreen('menuScreen'); $('#menuScreen .body').scrollTop = 0; }
+function openSafetyRules() {
+  openSettings();
+  const body = $('#settingsScreen .body'), card = $('#rulesCard');
+  body.scrollTop = card.offsetTop - 8;
+  card.scrollIntoView({ block: 'start' });
+  $('#sRules').focus({ preventScroll: true });
+}
+document.querySelectorAll('[data-menu]').forEach(b => b.onclick = showMenu);
+$('#menuNewChar').onclick = () => openEditor(null, 'menu');
+$('#menuChat').onclick = () => { if (activeChar()) closeScreens(); else { renderCharList(); openScreen('charsScreen'); } };
+$('#menuCharsBtn').onclick = () => { renderCharList(); openScreen('charsScreen'); };
+$('#menuSettings').onclick = () => openSettings();
+$('#menuSafety').onclick = () => openSafetyScreen();
+
+/* ---------------- Safety Rules screen (content filter) ---------------- */
+let sfDraft = DEFAULT_FILTER();
+function renderSafety() {
+  const f = sfDraft;
+  document.querySelectorAll('#sfLevel [data-level]').forEach(b => { const on = b.dataset.level === f.level; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
+  $('#sfCaption').textContent = FILTER_LEVELS[f.level].caption;
+  const box = $('#sfChips'); box.querySelectorAll('.chip').forEach(c => c.remove());
+  for (const t of f.topics) {
+    const c = el('span', 'chip'); c.dataset.topic = t; c.appendChild(el('span', null, t));
+    const x = el('button', null, '×'); x.type = 'button'; x.title = 'Remove ' + t; x.setAttribute('aria-label', 'Remove ' + t);
+    x.onclick = () => { sfDraft.topics = sfDraft.topics.filter(v => v !== t); renderSafety(); };
+    c.appendChild(x); box.insertBefore(c, $('#sfAdd'));
+  }
+  $('#sfNone').hidden = f.topics.length > 0;
+  document.querySelectorAll('#sfTone [data-tone]').forEach(b => { const on = b.dataset.tone === f.tone; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
+  $('#sfProf').setAttribute('aria-checked', String(!!f.profanity));
+}
+function openSafetyScreen() { sfDraft = contentFilter(); $('#sfAddRow').hidden = true; $('#sfTopicIn').value = ''; renderSafety(); openScreen('safetyScreen'); $('#safetyScreen .body').scrollTop = 0; }
+function addTopic() {
+  const t = cleanTopic($('#sfTopicIn').value); if (!t) { $('#sfTopicIn').focus(); return; }
+  if (sfDraft.topics.some(v => v.toLowerCase() === t.toLowerCase())) toast('Already blocked');
+  else if (sfDraft.topics.length >= 20) toast('Up to 20 topics');
+  else sfDraft.topics.push(t);
+  $('#sfTopicIn').value = ''; $('#sfAddRow').hidden = true; renderSafety();
+}
+document.querySelectorAll('#sfLevel [data-level]').forEach(b => b.onclick = () => { sfDraft = filterPreset(b.dataset.level); renderSafety(); });
+document.querySelectorAll('#sfTone [data-tone]').forEach(b => b.onclick = () => { sfDraft.tone = b.dataset.tone; renderSafety(); });
+$('#sfProf').onclick = () => { sfDraft.profanity = !sfDraft.profanity; renderSafety(); };
+$('#sfAdd').onclick = () => { const r = $('#sfAddRow'); r.hidden = !r.hidden; if (!r.hidden) $('#sfTopicIn').focus(); };
+$('#sfTopicOk').onclick = addTopic;
+$('#sfTopicIn').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addTopic(); } });
+$('#sfSave').onclick = () => { sfDraft = normalizeFilter(sfDraft); if (Store.set(FILTER_KEY, sfDraft)) { renderSafety(); toast('Safety rules saved: ' + FILTER_LEVELS[sfDraft.level].name); } };
+$('#sfReset').onclick = () => { Store.del(FILTER_KEY); sfDraft = DEFAULT_FILTER(); $('#sfAddRow').hidden = true; renderSafety(); toast('Safety rules reset to Open'); };
+$('#sfBack').onclick = showMenu;
+$('#sfAdvanced').onclick = openSafetyRules;
+
+/* ---------------- portrait sheet (menu grid: 📷 badge or long-press) ----------------
+   Reuses the editor's own portrait controls (#portraitArea: generatePortrait, Use as avatar, Regenerate) by moving
+   that block into the sheet while it is open, so generation and its guards are exactly the editor's. */
+let portraitHome = null;
+function restorePortraitArea() {
+  if (!portraitHome) return;
+  const a = $('#portraitArea'); portraitHome.parent.insertBefore(a, portraitHome.next); portraitHome = null;
+  $('#portraitBtn').textContent = '📸 Generate portrait';
+}
+const psOpen = () => $('#portraitSheet').classList.contains('open');
+function psMsg(t) { $('#psMsg').textContent = t || ''; }
+function renderPortraitSheet() {
+  if (!editing) return;
+  const n = listAvatarNode(editing); $('#psPreview').textContent = ''; $('#psPreview').appendChild(n);
+  $('#psName').textContent = editing.name || 'Unnamed';
+  $('#psTitle').textContent = 'Portrait: ' + (editing.name || 'Unnamed');
+  $('#psLook').textContent = appearanceSummary(editing) || 'No appearance set yet. Add some looks for a better portrait.';
+  $('#psRemove').disabled = !editing.avatarImg;
+}
+function openPortraitSheet(id) {
+  if (!chars.find(c => c.id === id)) return;
+  openEditor(id, 'menu');                 // loads the character into the editor state (form + `editing`), then we show the sheet instead
+  const a = $('#portraitArea');
+  if (!portraitHome) portraitHome = { parent: a.parentNode, next: a.nextSibling };
+  $('#psGen').appendChild(a);
+  $('#portraitBtn').textContent = editing.avatarImg ? '📸 Regenerate portrait' : '📸 Generate portrait';
+  $('#psGalBox').hidden = true; $('#psGalImg').removeAttribute('src'); $('#psFile').value = ''; psGallerySrc = '';
+  $('#psGate').hidden = true; $('#psGatePw').value = ''; if (!gateBusy) gateMsg('');
+  psMsg(''); renderPortraitSheet();
+  openScreen('portraitSheet'); $('#portraitSheet .body').scrollTop = 0;
+}
+/** Write the sheet's avatar into the saved character; returns false if storage is full. */
+function commitPortrait(img) {
+  const i = chars.findIndex(c => c.id === (editing && editing.id)); if (i < 0) return false;
+  const prev = chars[i].avatarImg || '';
+  chars[i].avatarImg = img || '';
+  if (!saveChars()) {
+    const small = img && img.length > 12000 ? shrinkDataUrlSync(img, 96) : '';
+    if (small) { chars[i].avatarImg = small; if (saveChars()) { editing.avatarImg = small; return true; } }
+    chars[i].avatarImg = prev; saveChars(); psMsg("⚠️ Storage is full: couldn't save the portrait. Delete old chats to free space."); return false;
+  }
+  if (chars[i].id === activeId) { renderHeader(); renderMessages(); }
+  return true;
+}
+function closePortraitSheet() { resetPortrait(); showMenu(); }
+$('#psSave').onclick = () => { if (commitPortrait(editing.avatarImg)) { closePortraitSheet(); toast('Portrait saved'); } };
+$('#psCancel').onclick = closePortraitSheet;
+$('#psBack').onclick = closePortraitSheet;
+$('#psRemove').onclick = () => { editing.avatarImg = ''; refreshEditorPreview(); psMsg('Portrait removed. Tap Save to keep the change.'); };
+$('#psEditLook').onclick = () => {
+  const id = editing.id; openEditor(id, 'menu');
+  const b = $('#editorScreen .body'), sct = [...document.querySelectorAll('#edForm .sect')].find(x => /Appearance/.test(x.textContent));
+  if (sct) b.scrollTop = sct.offsetTop - 60;
+};
+// gallery gate: a password checked against a salted 5-pass PBKDF2 hash (no plaintext in this file). Unlock lasts for this
+// page session only (kept in memory, never in storage); after 5 wrong tries there is a growing wait.
+const GALLERY_GATE = Object.freeze({"v":5,"alg":"PBKDF2-HMAC-SHA-512x600000 > SHA-256x200000 > SHA-384x100000 > SHA-256x50000 > SHA-512x50000","passes":[{"hash":"SHA-512","iter":600000,"salt":"7a30b58f0e414f74c515120206566fda"},{"hash":"SHA-256","iter":200000,"salt":"08c187be62a4c3bc1bc6b1f5ee6dbdb0"},{"hash":"SHA-384","iter":100000,"salt":"8f3f67797b04fcce7f0b2cf710cf92cb"},{"hash":"SHA-256","iter":50000,"salt":"22ecf8abbf113e10a812fc35a0b39cc2"},{"hash":"SHA-512","iter":50000,"salt":"50104e83d08c2a61056e49da4af261d7"}],"hash":"9fd189a01dcaf199787323acae03a68c38795f868d48530be68f2c3a14c6b6ed38248e95b98b6930c7bfc739f97d3b439687b4aa39a9cbe8cc048c0e3b2659ce"});   // set by tools/set_gallery_password.js (salted 5-pass PBKDF2; no plaintext)
+let galleryUnlocked = false, gateFails = 0, gateUntil = 0, gateBusy = false;
+const hexToBytes = h => new Uint8Array((String(h).match(/../g) || []).map(x => parseInt(x, 16)));
+const bytesToHex = b => [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');
+async function gateScramble(pw) {
+  const enc = new TextEncoder(); let input = enc.encode(pw), out = null;
+  for (const p of GALLERY_GATE.passes) {
+    const key = await crypto.subtle.importKey('raw', input, 'PBKDF2', false, ['deriveBits']);
+    out = await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: p.hash, salt: hexToBytes(p.salt), iterations: p.iter }, key, { 'SHA-256': 256, 'SHA-384': 384, 'SHA-512': 512 }[p.hash]);
+    input = enc.encode(bytesToHex(out));
+  }
+  return bytesToHex(out);
+}
+function sameHex(a, b) { if (a.length !== b.length) return false; let d = 0; for (let i = 0; i < a.length; i++) d |= a.charCodeAt(i) ^ b.charCodeAt(i); return d === 0; }
+function gateMsg(t) { $('#psGateMsg').textContent = t || ''; }
+async function tryUnlockGallery() {
+  if (gateBusy) return false;
+  const inp = $('#psGatePw'), pw = inp.value; inp.value = '';
+  const wait = Math.ceil((gateUntil - Date.now()) / 1000);
+  if (wait > 0) { gateMsg('⏳ Too many wrong tries. Wait ' + wait + 's and try again.'); return false; }
+  if (!pw) { gateMsg('Enter the password.'); inp.focus(); return false; }
+  if (!GALLERY_GATE || !window.crypto || !crypto.subtle) { gateMsg("⚠️ The gallery lock isn't set up on this device."); return false; }
+  gateBusy = true; $('#psGateOk').disabled = true; gateMsg('Checking…');
+  let ok = false;
+  try { ok = sameHex(await gateScramble(pw), GALLERY_GATE.hash); } catch (e) { ok = false; }
+  gateBusy = false; $('#psGateOk').disabled = false;
+  if (ok) { galleryUnlocked = true; gateFails = 0; gateUntil = 0; $('#psGate').hidden = true; gateMsg(''); psMsg('🔓 Gallery unlocked for this session. Tap 🖼️ Choose from gallery.'); return true; }
+  gateFails++;
+  if (gateFails >= 5) { const secs = Math.min(600, 30 * Math.pow(2, gateFails - 5)); gateUntil = Date.now() + secs * 1000; gateMsg('❌ Wrong password. Too many tries: wait ' + secs + 's.'); }
+  else gateMsg('❌ Wrong password.');
+  inp.focus();
+  return false;
+}
+$('#psGateOk').onclick = tryUnlockGallery;
+$('#psGatePw').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); tryUnlockGallery(); } });
+// gallery photo: stays on this device (downscaled here, stored in localStorage like generated portraits; never sent anywhere)
+let psGallerySrc = '';
+$('#psGalleryBtn').onclick = () => { if (galleryUnlocked) { $('#psFile').click(); return; } $('#psGate').hidden = false; gateMsg(''); $('#psGatePw').focus(); };
+$('#psFile').onchange = () => {
+  const f = $('#psFile').files[0]; if (!f) return;
+  if (!/^image\//.test(f.type)) { psMsg("⚠️ That file isn't an image."); return; }
+  const rd = new FileReader();
+  rd.onload = async () => {
+    try { psGallerySrc = await shrinkImage(String(rd.result), 512, 0.85); }
+    catch (e) { psGallerySrc = ''; psMsg("⚠️ Couldn't read that photo."); return; }
+    $('#psGalImg').src = psGallerySrc; $('#psGalBox').hidden = false; psMsg('');
+  };
+  rd.onerror = () => psMsg("⚠️ Couldn't read that photo.");
+  rd.readAsDataURL(f);
+};
+$('#psGalCancel').onclick = () => { psGallerySrc = ''; $('#psGalBox').hidden = true; $('#psGalImg').removeAttribute('src'); $('#psFile').value = ''; };
+$('#psGalUse').onclick = async () => {
+  if (!psGallerySrc || !editing) return;
+  let img; try { img = await shrinkImage(psGallerySrc, 256, 0.85); } catch (e) { psMsg("⚠️ Couldn't use that photo."); return; }
+  const before = editing.avatarImg; editing.avatarImg = img;
+  if (!commitPortrait(img)) { editing.avatarImg = before; return; }
+  psGallerySrc = ''; $('#psGalBox').hidden = true; $('#psFile').value = '';
+  refreshEditorPreview(); renderMenu(); psMsg('✅ Photo saved as the portrait.'); toast('Portrait saved');
+};
 
 /* ---------------- character list ---------------- */
 /* ---- character list icons: the portrait if there is one, else a small avatar drawn from the character's looks ---- */
@@ -1373,6 +1736,7 @@ function refreshEditorPreview() {
   $('#promptPre').textContent = buildSystemPrompt(editing);
   $('#portraitPre').textContent = buildPortraitPrompt(editing);
   $('#genderCustomWrap').hidden = editing.gender !== 'custom';
+  if (psOpen()) renderPortraitSheet();
 }
 function renderTraits() {
   $('#traits').textContent = '';
@@ -1563,13 +1927,14 @@ $('#resetRulesBtn').onclick = resetRules;
 
 /* ---------------- start ---------------- */
 openChat(activeId);
+renderMenu();   // the menu screen is open from the start (class="screen open")
 // PWA: register the service worker only when served over http(s); file:// just works without it
 (function () {
   if (!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol)) return;
   window.addEventListener('load', function () { try { navigator.serviceWorker.register('./sw.js').catch(function () {}); } catch (e) {} });
 })();
 // read-only hook for the automated tests (never exposes the API key)
-window.App = Object.freeze({ Guard, buildSystemPrompt, buildPortraitPrompt, buildSelfiePrompt, PRESETS, adultProblem, looksMinor, exportJSON, importJSON, SAFETY_RULES, LOCKED_RULES, effectiveSafetyRules, chars: () => chars, history: () => history, activeId: () => activeId });
+window.App = Object.freeze({ Guard, buildSystemPrompt, buildPortraitPrompt, buildSelfiePrompt, PRESETS, adultProblem, looksMinor, exportJSON, importJSON, SAFETY_RULES, LOCKED_RULES, effectiveSafetyRules, contentFilter, contentFilterSection, FILTER_LEVELS, chars: () => chars, history: () => history, activeId: () => activeId });
 </script>
 </body>
 </html>
