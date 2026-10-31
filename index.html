@@ -134,7 +134,7 @@
   .keyrow{display:flex;gap:6px}
   .keyrow input{flex:1}
   .keybtns{display:flex;gap:6px;margin-top:6px}
-  #sKeyFull{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.4;white-space:pre-wrap;word-break:break-all;overflow-wrap:anywhere;resize:none;overflow:hidden;background:#101520}
+  #sKey{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.4;white-space:pre-wrap;word-break:break-all;overflow-wrap:anywhere;resize:none;overflow:hidden;background:#101520}
   #sKeyLen{margin-top:4px}
   .note{font-size:12.5px;color:var(--dim);line-height:1.45;margin:6px 0 0}
   #psGateHelp{color:var(--ink);overflow-wrap:anywhere}#psGateHelp a{color:var(--accent);font-weight:700}#psGateCopy{margin-left:6px;padding:3px 9px;font-size:12px;vertical-align:middle}
@@ -415,10 +415,9 @@
         <label class="f">Image model <small>For 🖼️ pictures, e.g. grok-imagine-image-2.0.</small><input type="text" id="sImgModel" autocomplete="off" spellcheck="false"></label>
         <label class="f">Image shape<select id="sImgAspect"><option value="1:1">Square (1:1)</option><option value="3:4">Portrait (3:4)</option><option value="4:3">Landscape (4:3)</option><option value="9:16">Tall (9:16)</option><option value="16:9">Wide (16:9)</option><option value="auto">Let the model choose</option></select></label>
         <div class="f wide"><label class="f" for="sKey" style="margin:0">API key</label>
-          <input type="password" id="sKey" maxlength="1024" autocomplete="off" spellcheck="false" placeholder="Paste your key">
-          <textarea id="sKeyFull" hidden rows="2" maxlength="1024" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="API key (shown in full)"></textarea>
+          <textarea id="sKey" rows="2" maxlength="1024" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Paste your key"></textarea>
           <p class="note" id="sKeyLen" aria-live="polite" hidden></p>
-          <div class="keybtns"><button class="btn small" id="showKeyBtn" type="button">Show</button><button class="btn small danger" id="clearKeyBtn" type="button">Clear key</button></div>
+          <div class="keybtns"><button class="btn small danger" id="clearKeyBtn" type="button">Clear key</button></div>
           <p class="note lock">🔒 Your key is saved only in this browser's storage on this device. It is sent only to the API URL above, never anywhere else, and is never included in exports. Anyone who can use this browser on this device could read it, so clear it if you share the device.</p></div>
       </div>
     </div>
@@ -1907,12 +1906,13 @@ function shrinkDataUrlSync(src, side) {
 function openSettings() {
   const s = Store.settings();
   $('#sBase').value = s.baseUrl; $('#sModel').value = s.model; $('#sKey').value = Store.getKey();
-  setKeyShown(false); updateKeyLen();
+  updateKeyLen();
   $('#sImgModel').value = s.imageModel; $('#sImgAspect').value = s.imageAspect;
   $('#sTemp').value = s.temperature; $('#sMax').value = s.maxTokens; $('#sMem').value = s.memory; $('#sStream').checked = !!s.stream;
   $('#testOut').textContent = '';
   loadRulesEditor();
   openScreen('settingsScreen');
+  fitKey();
 }
 function saveSettings(quiet) {
   const base = $('#sBase').value.trim() || DEFAULT_SETTINGS.baseUrl;
@@ -1932,24 +1932,16 @@ $('#saveSettingsBtn').onclick = () => saveSettings(false);
    No length cap beyond maxlength=1024 (far above any real key). Only the length is ever shown, never logged. */
 function cleanKey(v) { return String(v || '').replace(/\s+/g, ''); }
 function updateKeyLen() { const n = $('#sKey').value.length, el = $('#sKeyLen'); el.hidden = !n; el.textContent = n ? 'Key length: ' + n + ' character' + (n === 1 ? '' : 's') : ''; }
-function setKeyShown(show) {
-  const k = $('#sKey'), full = $('#sKeyFull');
-  k.type = show ? 'text' : 'password'; k.hidden = show; full.hidden = !show;
-  full.value = show ? k.value : '';
-  if (show) fitKeyFull();
-  $('#showKeyBtn').textContent = show ? 'Hide' : 'Show';
-}
-function fitKeyFull() { const full = $('#sKeyFull'); full.style.height = 'auto'; full.style.height = full.scrollHeight + 2 + 'px'; }
-/* Shown state: the wrapped copy is editable too. Every edit is cleaned (whitespace stripped, caret kept in place)
-   and mirrored into #sKey, which stays the single value Save / Clear / the length line read. */
-$('#sKeyFull').addEventListener('input', () => {
-  const full = $('#sKeyFull'), raw = full.value, c = cleanKey(raw).slice(0, 1024);
-  if (c !== raw) { const caret = cleanKey(raw.slice(0, full.selectionStart || 0)).length; full.value = c; const p = Math.min(caret, c.length); full.setSelectionRange(p, p); }
-  $('#sKey').value = c; updateKeyLen(); fitKeyFull();
+function fitKey() { const k = $('#sKey'); k.style.height = 'auto'; k.style.height = k.scrollHeight + 2 + 'px'; }
+/* The key box always shows the whole key, wrapped (no masking, no Show/Hide). Every edit is cleaned
+   (whitespace stripped, caret kept in place); Save / Clear / the length line all read this one box. */
+$('#sKey').addEventListener('input', () => {
+  const k = $('#sKey'), raw = k.value, c = cleanKey(raw).slice(0, 1024);
+  if (c !== raw) { const caret = cleanKey(raw.slice(0, k.selectionStart || 0)).length; k.value = c; const p = Math.min(caret, c.length); k.setSelectionRange(p, p); }
+  updateKeyLen(); fitKey();
 });
-$('#sKey').addEventListener('input', () => { const k = $('#sKey'), c = cleanKey(k.value); if (c !== k.value) k.value = c; updateKeyLen(); });
-$('#showKeyBtn').onclick = () => setKeyShown($('#sKey').type === 'password');
-$('#clearKeyBtn').onclick = () => { $('#sKey').value = ''; Store.setKey(''); setKeyShown(false); updateKeyLen(); toast('API key removed from this device'); };
+window.addEventListener('resize', () => { if ($('#settingsScreen').classList.contains('open')) fitKey(); });
+$('#clearKeyBtn').onclick = () => { $('#sKey').value = ''; Store.setKey(''); updateKeyLen(); fitKey(); toast('API key removed from this device'); };
 $('#testBtn').onclick = async () => {
   if (!saveSettings(true)) return;
   const out = $('#testOut'); out.textContent = 'Testing…';
