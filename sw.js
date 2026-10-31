@@ -3,7 +3,7 @@
    It only ever touches same-origin GET requests: calls to the AI API (a different origin, POST) are never
    intercepted or cached, so chats and the API key never end up in the cache.
    Bump CACHE_VERSION whenever index.html, manifest.json or the icons change so the phone picks up the new version. */
-const CACHE_VERSION = 'chatbot-v6';
+const CACHE_VERSION = 'chatbot-v8';
 const APP_FILES = [
   './',
   './index.html',

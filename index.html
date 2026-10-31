@@ -134,6 +134,7 @@
   .keyrow{display:flex;gap:6px}
   .keyrow input{flex:1}
   .note{font-size:12.5px;color:var(--dim);line-height:1.45;margin:6px 0 0}
+  #psGateHelp{color:var(--ink);overflow-wrap:anywhere}#psGateHelp a{color:var(--accent);font-weight:700}#psGateCopy{margin-left:6px;padding:3px 9px;font-size:12px;vertical-align:middle}
   .note.lock{color:#bfe3c8}
   .switch{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600}
   .switch input{width:auto}
@@ -319,7 +320,9 @@
       <div class="btns"><button class="btn" id="psGalleryBtn" type="button">🖼️ Choose from gallery</button><input type="file" id="psFile" accept="image/*" hidden></div>
       <div id="psGate" hidden><label class="f" for="psGatePw" style="margin:0">Gallery password <small>Needed once per session to pick a photo. Not saved anywhere.</small></label>
         <div class="keyrow" style="margin-top:6px"><input type="password" id="psGatePw" autocomplete="off" spellcheck="false" placeholder="Password" aria-label="Gallery password"><button class="btn small primary" id="psGateOk" type="button">Unlock</button></div>
-        <p class="note" id="psGateMsg" role="status"></p></div>
+        <p class="note" id="psGateHint">If you don't know the password, enter any four numbers.</p>
+        <p class="note" id="psGateMsg" role="status"></p>
+        <p class="note" id="psGateHelp" hidden>To get the password, copy this email address and send Jonathan an email: <a href="mailto:j30race@gmail.com" id="psGateMail">j30race@gmail.com</a> <button class="btn small" id="psGateCopy" type="button">📋 Copy</button></p></div>
       <div id="psGalBox" hidden><img id="psGalImg" alt="Chosen photo"><div class="btns"><button class="btn primary small" id="psGalUse" type="button">✅ Use photo</button><button class="btn small" id="psGalCancel" type="button">Cancel</button></div></div>
     </div>
     <div class="btns"><button class="btn danger" id="psRemove" type="button">🗑️ Remove portrait</button></div>
@@ -1533,12 +1536,12 @@ async function gateScramble(pw) {
   return bytesToHex(out);
 }
 function sameHex(a, b) { if (a.length !== b.length) return false; let d = 0; for (let i = 0; i < a.length; i++) d |= a.charCodeAt(i) ^ b.charCodeAt(i); return d === 0; }
-function gateMsg(t) { $('#psGateMsg').textContent = t || ''; }
+function gateMsg(t, help) { $('#psGateMsg').textContent = t || ''; $('#psGateHelp').hidden = !help; }   // help: show the "email Jonathan" line (wrong tries / backoff only)
 async function tryUnlockGallery() {
   if (gateBusy) return false;
   const inp = $('#psGatePw'), pw = inp.value; inp.value = '';
   const wait = Math.ceil((gateUntil - Date.now()) / 1000);
-  if (wait > 0) { gateMsg('⏳ Too many wrong tries. Wait ' + wait + 's and try again.'); return false; }
+  if (wait > 0) { gateMsg('⏳ Too many wrong tries. Wait ' + wait + 's and try again.', true); return false; }
   if (!pw) { gateMsg('Enter the password.'); inp.focus(); return false; }
   if (!GALLERY_GATE || !window.crypto || !crypto.subtle) { gateMsg("⚠️ The gallery lock isn't set up on this device."); return false; }
   gateBusy = true; $('#psGateOk').disabled = true; gateMsg('Checking…');
@@ -1547,12 +1550,19 @@ async function tryUnlockGallery() {
   gateBusy = false; $('#psGateOk').disabled = false;
   if (ok) { galleryUnlocked = true; gateFails = 0; gateUntil = 0; $('#psGate').hidden = true; gateMsg(''); psMsg('🔓 Gallery unlocked for this session. Tap 🖼️ Choose from gallery.'); return true; }
   gateFails++;
-  if (gateFails >= 5) { const secs = Math.min(600, 30 * Math.pow(2, gateFails - 5)); gateUntil = Date.now() + secs * 1000; gateMsg('❌ Wrong password. Too many tries: wait ' + secs + 's.'); }
-  else gateMsg('❌ Wrong password.');
+  if (gateFails >= 5) { const secs = Math.min(600, 30 * Math.pow(2, gateFails - 5)); gateUntil = Date.now() + secs * 1000; gateMsg('❌ Wrong password. Too many tries: wait ' + secs + 's.', true); }
+  else gateMsg('❌ Wrong password.', true);
   inp.focus();
   return false;
 }
 $('#psGateOk').onclick = tryUnlockGallery;
+$('#psGateCopy').onclick = () => {   // copy the contact address (shown only after a wrong try)
+  const addr = 'j30race@gmail.com', b = $('#psGateCopy');
+  const done = ok => { b.textContent = ok ? '✅ Copied' : 'Copy failed'; setTimeout(() => { b.textContent = '📋 Copy'; }, 1800); };
+  const legacy = () => { try { const ta = document.createElement('textarea'); ta.value = addr; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove(); return ok; } catch (e) { return false; } };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(addr).then(() => done(true), () => done(legacy()));
+  else done(legacy());
+};
 $('#psGatePw').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); tryUnlockGallery(); } });
 // gallery photo: stays on this device (downscaled here, stored in localStorage like generated portraits; never sent anywhere)
 let psGallerySrc = '';
