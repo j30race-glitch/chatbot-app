@@ -111,6 +111,7 @@
   label.f small,.hint{font-weight:400;color:var(--dim);font-size:12px;line-height:1.35}
   .avrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
   [hidden]{display:none!important}
+  .gtsub{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:var(--dim);min-width:0}.gtsub label{display:flex;align-items:center;gap:8px;font-weight:400;color:var(--ink);font-size:14px}.gtsub input[type=radio]{width:auto;padding:0;margin:0;accent-color:var(--accent)}.gtsurg{margin-left:24px;padding-left:10px;border-left:2px solid #3a4763}
   .sect{border-top:1px solid #3a4763;padding-top:12px;margin-top:4px}
   .sect h3{margin:0 0 2px;font-size:16px}
   .sect p{margin:0;font-size:12.5px;color:var(--dim)}
@@ -353,7 +354,8 @@
       <div class="f wide"><label class="f" style="margin:0">Avatar <small>An emoji, or upload a picture (shrunk to a small image and kept on this device).</small></label>
         <div class="avrow"><span class="av big" id="edAv">🙂</span><input type="text" data-k="avatarEmoji" maxlength="8" aria-label="Avatar emoji"><button class="btn small" id="avUploadBtn" type="button">Upload image</button><button class="btn small" id="avClearBtn" type="button">Use emoji</button><input type="file" id="avFile" accept="image/*" hidden></div></div>
       <div class="f wide sect"><h3>👤 Appearance</h3><p>Used for photorealistic portraits and 📸 photos, and shared with the chat so they know how they look. Always an adult (18+).</p></div>
-      <label class="f">Gender<select data-k="gender" id="edGender"><option value="">Not specified</option><option value="woman">Woman</option><option value="man">Man</option><option value="non-binary">Non-binary</option><option value="custom">Custom…</option></select></label>
+      <label class="f">Gender<select data-k="gender" id="edGender"><option value="">Not specified</option><option value="woman">Woman</option><option value="man">Man</option><option value="non-binary">Non-binary</option><option value="trans">Trans</option><option value="custom">Custom…</option></select></label>
+      <div class="f gtsub" id="genderTransWrap" role="radiogroup" aria-label="Trans">Trans<label><input type="radio" name="genderTrans" value="mtf">Male to female</label><label><input type="radio" name="genderTrans" value="ftm">Female to male</label><div class="gtsub gtsurg" id="genderSurgeryWrap" role="radiogroup" aria-label="Surgery status"><span id="genderSurgeryHead">Surgery status</span><label><input type="radio" name="genderSurgery" value="surgery">Surgery</label><label><input type="radio" name="genderSurgery" value="non-surgery">Non-surgery</label></div></div>
       <label class="f" id="genderCustomWrap">Custom gender<input type="text" data-k="genderCustom" maxlength="60" placeholder="e.g. genderfluid, trans woman"></label>
       <label class="f">Apparent age <small>Adults only.</small><select data-a="ageRange"><option value="20s">20s (18+)</option><option value="30s">30s</option><option value="40s">40s</option><option value="50s">50s</option><option value="60s">60s</option><option value="70s">70+</option></select></label>
       <label class="f">Ethnicity / skin tone <small>Optional.</small><input type="text" data-a="ethnicity" maxlength="200" list="dlSkin" placeholder="e.g. light olive skin"></label>
@@ -709,7 +711,7 @@ function buildSystemPrompt(c) {
     'Name: ' + name
   ];
   for (const [k, label] of FIELD_LABELS) { const v = sanitizeField(c[k]); if (v) lines.push(label + ': ' + v); }
-  const g = genderLabel(c); if (g) lines.push('Gender: ' + g);
+  const g = genderLabel(c); if (g) lines.push('Gender: ' + g + (c.gender === 'trans' && TRANS_SUBS[c.genderTrans] && SURGERY_DESC[c.genderSurgery] ? ', ' + SURGERY_DESC[c.genderSurgery] : ''));
   const look = appearanceSummary(c); if (look) lines.push('Appearance: ' + look);
   const traits = (c.customTraits || []).filter(t => sanitizeField(t.key) || sanitizeField(t.value));
   if (traits.length) { lines.push('Custom traits:'); for (const t of traits) lines.push('- ' + sanitizeField(t.key) + ': ' + sanitizeField(t.value)); }
@@ -721,7 +723,9 @@ function buildSystemPrompt(c) {
 /* ---------------- appearance, presets, adults-only ---------------- */
 const AGE_RANGES = Object.freeze({ '20s': 'in their twenties', '30s': 'in their thirties', '40s': 'in their forties', '50s': 'in their fifties', '60s': 'in their sixties', '70s': 'in their seventies or older' });
 const APPEARANCE_KEYS = Object.freeze(['ageRange', 'ethnicity', 'build', 'hairStyle', 'hairColor', 'eyeColor', 'facialHair', 'outfit', 'accessories', 'setting', 'extra']);
-const GENDERS = Object.freeze(['', 'woman', 'man', 'non-binary', 'custom']);
+const GENDERS = Object.freeze(['', 'woman', 'man', 'non-binary', 'trans', 'custom']);
+const SURGERY_DESC = Object.freeze({ surgery: 'post-surgery', 'non-surgery': 'non-surgical' });
+const TRANS_SUBS = Object.freeze({ mtf: { label: 'Trans woman (male to female)', noun: 'trans woman (male to female)' }, ftm: { label: 'Trans man (female to male)', noun: 'trans man (female to male)' } });
 const BLANK_APPEARANCE = () => ({ ageRange: '30s', ethnicity: '', build: '', hairStyle: '', hairColor: '', eyeColor: '', facialHair: '', outfit: '', accessories: '', setting: '', extra: '' });
 function normalizeAppearance(a) {
   const o = BLANK_APPEARANCE();
@@ -733,6 +737,8 @@ function normalizeAppearance(a) {
 function normalizeChar(c) {
   if (!GENDERS.includes(c.gender)) c.gender = '';
   c.genderCustom = typeof c.genderCustom === 'string' ? c.genderCustom.slice(0, 60) : '';
+  if (!Object.prototype.hasOwnProperty.call(TRANS_SUBS, c.genderTrans)) c.genderTrans = '';
+  if (!Object.prototype.hasOwnProperty.call(SURGERY_DESC, c.genderSurgery) || !c.genderTrans) c.genderSurgery = '';
   c.appearance = normalizeAppearance(c.appearance);
   if (typeof c.behavior !== 'string') c.behavior = '';
   if (!PRESETS.some(p => p.id === c.preset)) c.preset = '';
@@ -740,10 +746,12 @@ function normalizeChar(c) {
 }
 function genderLabel(c) {
   if (c.gender === 'custom') return sanitizeField(c.genderCustom).slice(0, 60);
+  if (c.gender === 'trans') return TRANS_SUBS[c.genderTrans] ? TRANS_SUBS[c.genderTrans].label : 'Trans';
   return { woman: 'Woman', man: 'Man', 'non-binary': 'Non-binary' }[c.gender] || '';
 }
 function genderNoun(c) {
   if (c.gender === 'custom') return sanitizeField(c.genderCustom).replace(/\s+/g, ' ').slice(0, 60) || 'person';
+  if (c.gender === 'trans') return TRANS_SUBS[c.genderTrans] ? TRANS_SUBS[c.genderTrans].noun : 'trans person';
   return { woman: 'woman', man: 'man', 'non-binary': 'non-binary person' }[c.gender] || 'person';
 }
 function lookParts(c) {
@@ -851,7 +859,7 @@ const PRESETS = Object.freeze([
 ]);
 /* ---------------- characters ---------------- */
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-const BLANK_CHAR = () => ({ id: uid(), name: '', age: '', avatarEmoji: '🙂', avatarImg: '', personality: '', backstory: '', tone: '', speakingStyle: '', quirks: '', likes: '', dislikes: '', relationship: '', exampleDialogue: '', greeting: '', otherTraits: '', customTraits: [], behavior: '', preset: '', gender: '', genderCustom: '', appearance: BLANK_APPEARANCE() });
+const BLANK_CHAR = () => ({ id: uid(), name: '', age: '', avatarEmoji: '🙂', avatarImg: '', personality: '', backstory: '', tone: '', speakingStyle: '', quirks: '', likes: '', dislikes: '', relationship: '', exampleDialogue: '', greeting: '', otherTraits: '', customTraits: [], behavior: '', preset: '', gender: '', genderCustom: '', genderTrans: '', genderSurgery: '', appearance: BLANK_APPEARANCE() });
 const STARTERS = () => [
   Object.assign(BLANK_CHAR(), {
     id: 'starter-rex', name: 'Rex', age: '52', avatarEmoji: '🥃',
@@ -1719,6 +1727,8 @@ function openEditor(id, from) {
   normalizeChar(editing);
   document.querySelectorAll('#edForm [data-k]').forEach(inp => { inp.value = editing[inp.dataset.k] || ''; });
   document.querySelectorAll('#edForm [data-a]').forEach(inp => { inp.value = editing.appearance[inp.dataset.a] || ''; });
+  document.querySelectorAll('#edForm input[name="genderTrans"]').forEach(r => { r.checked = r.value === editing.genderTrans; });
+  document.querySelectorAll('#edForm input[name="genderSurgery"]').forEach(r => { r.checked = r.value === editing.genderSurgery; });
   $('#edPreset').value = editing.preset || '';
   resetPortrait();
   renderTraits(); refreshEditorPreview();
@@ -1729,6 +1739,11 @@ function readEditor() {
   document.querySelectorAll('#edForm [data-k]').forEach(inp => { editing[inp.dataset.k] = inp.value; });
   editing.appearance = editing.appearance || BLANK_APPEARANCE();
   document.querySelectorAll('#edForm [data-a]').forEach(inp => { editing.appearance[inp.dataset.a] = inp.value; });
+  const prevT = editing.genderTrans || '', uncheck = n => document.querySelectorAll('#edForm input[name="' + n + '"]').forEach(r => { r.checked = false; });
+  if (editing.gender !== 'trans') { uncheck('genderTrans'); uncheck('genderSurgery'); }
+  const gt = document.querySelector('#edForm input[name="genderTrans"]:checked'); editing.genderTrans = gt ? gt.value : '';
+  if (editing.genderTrans !== prevT) uncheck('genderSurgery');
+  const gs = document.querySelector('#edForm input[name="genderSurgery"]:checked'); editing.genderSurgery = gs ? gs.value : '';
   editing.customTraits = [...document.querySelectorAll('#traits .trait')].map(r => ({ key: r.children[0].value, value: r.children[1].value })).filter(t => t.key.trim() || t.value.trim());
 }
 function refreshEditorPreview() {
@@ -1736,6 +1751,9 @@ function refreshEditorPreview() {
   $('#promptPre').textContent = buildSystemPrompt(editing);
   $('#portraitPre').textContent = buildPortraitPrompt(editing);
   $('#genderCustomWrap').hidden = editing.gender !== 'custom';
+  $('#genderTransWrap').hidden = editing.gender !== 'trans';
+  $('#genderSurgeryWrap').hidden = editing.gender !== 'trans' || !TRANS_SUBS[editing.genderTrans];
+  $('#genderSurgeryHead').textContent = editing.genderTrans === 'ftm' ? 'Female to male: surgery status' : 'Male to female: surgery status';
   if (psOpen()) renderPortraitSheet();
 }
 function renderTraits() {
