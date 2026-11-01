@@ -1977,7 +1977,23 @@ renderMenu();   // the menu screen is open from the start (class="screen open")
 // PWA: register the service worker only when served over http(s); file:// just works without it
 (function () {
   if (!('serviceWorker' in navigator) || !/^https?:$/.test(location.protocol)) return;
-  window.addEventListener('load', function () { try { navigator.serviceWorker.register('./sw.js').catch(function () {}); } catch (e) {} });
+  // A new version takes over (skipWaiting + clients.claim in sw.js): reload once so the open page shows the new build
+  // instead of the old one until the next open. Not on the very first install (no previous controller), and never
+  // in the middle of a streaming reply (waits for it to finish).
+  var hadController = !!navigator.serviceWorker.controller, reloading = false;
+  navigator.serviceWorker.addEventListener('controllerchange', function () {
+    if (!hadController || reloading) { hadController = true; return; }
+    reloading = true;
+    (function go() { var b = document.querySelector('#sendBtn'); if (b && b.classList.contains('stop')) return setTimeout(go, 1000); location.reload(); })();
+  });
+  window.addEventListener('load', function () {
+    try {
+      navigator.serviceWorker.register('./sw.js').then(function (reg) {
+        // reopening the app from the background doesn't navigate, so check for a new version whenever it comes back into view
+        document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') reg.update().catch(function () {}); });
+      }).catch(function () {});
+    } catch (e) {}
+  });
 })();
 // read-only hook for the automated tests (never exposes the API key)
 window.App = Object.freeze({ Guard, buildSystemPrompt, buildPortraitPrompt, buildSelfiePrompt, PRESETS, adultProblem, looksMinor, exportJSON, importJSON, SAFETY_RULES, LOCKED_RULES, effectiveSafetyRules, contentFilter, contentFilterSection, FILTER_LEVELS, chars: () => chars, history: () => history, activeId: () => activeId });
